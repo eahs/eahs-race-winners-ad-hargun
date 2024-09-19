@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RaceWinners;
@@ -12,12 +14,30 @@ public class Program
         // Asynchronously retrieve the group (class) data
         var data = await ds.GetGroupRanksAsync();
 
-        for (int i = 0; i < data.Count; i++)
+        List<(string Name, double AvgScore)> classScores = new List<(string, double)>();
+
+        // get the average scor 
+        foreach (var group in data)
         {
-            // Combine the ranks to print as a list
-            var ranks = String.Join(", ", data[i].Ranks);
-            
-            Console.WriteLine($"{data[i].Name} - [{ranks}]");
+            var avgScore = group.Ranks.Average();
+            classScores.Add((group.Name, avgScore));
+            var ranks = String.Join(", ", group.Ranks);
+            Console.WriteLine($"{group.Name} - [{ranks}]");
+            Console.WriteLine($"{group.Name}'s avg placement was {avgScore}");
+            Console.WriteLine();
+        }
+
+        Console.WriteLine();
+     
+        Console.WriteLine();
+
+        // Order by avg
+        var rankedClasses = classScores.OrderBy(cs => cs.AvgScore).ToList();
+
+        // Display places
+        for (int i = 0; i < rankedClasses.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}. {rankedClasses[i].Name} - Average Score: {rankedClasses[i].AvgScore}");
         }
     }
 }
